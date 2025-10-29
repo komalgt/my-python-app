@@ -2,11 +2,12 @@ pipeline {
     agent any
 
     environment {
-        REGISTRY_URL = 'myregistry.example.com'
-        REPO_NAME    = 'my-python-app'
-        IMAGE_TAG    = "${env.BUILD_NUMBER}"
-        DOCKER_IMAGE = "${env.REGISTRY_URL}/${env.REPO_NAME}:${env. IMAGE_TAG}"
-        REGISTRY_CREDENTIALS = 'my-docker-creds' // Jenkins credentials ID
+        DOCKER_HUB_USER        = 'komalgt' // Your Docker Hub username
+        REGISTRY_URL           = 'index.docker.io/v1'
+        REPO_NAME              = 'my-python-app'
+        IMAGE_TAG              = "${BUILD_NUMBER}"
+        DOCKER_IMAGE           = "${DOCKER_HUB_USER}/${REPO_NAME}:${IMAGE_TAG}"
+        REGISTRY_CREDENTIALS   = 'my-docker-creds' // Jenkins credentials ID
     }
 
     stages {
@@ -19,16 +20,16 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build(DOCKER_IMAGE)
+                    docker.build("${DOCKER_IMAGE}")
                 }
             }
         }
 
-        stage('Push to Registry') {
+        stage('Push to Docker Hub') {
             steps {
                 script {
                     docker.withRegistry("https://${REGISTRY_URL}", REGISTRY_CREDENTIALS) {
-                        docker.image(DOCKER_IMAGE).push()
+                        docker.image("${DOCKER_IMAGE}").push()
                     }
                 }
             }
