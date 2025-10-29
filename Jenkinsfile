@@ -3,11 +3,11 @@ pipeline {
 
     environment {
         DOCKER_HUB_USER        = 'komalgt' // Your Docker Hub username
-        REGISTRY_URL           = 'index.docker.io/v1'
         REPO_NAME              = 'my-python-app'
         IMAGE_TAG              = "${BUILD_NUMBER}"
         DOCKER_IMAGE           = "${DOCKER_HUB_USER}/${REPO_NAME}:${IMAGE_TAG}"
         REGISTRY_CREDENTIALS   = 'my-docker-creds' // Jenkins credentials ID
+        REGISTRY_URL           = 'https://index.docker.io/v1/' // <<-- This is correct
     }
 
     stages {
@@ -20,7 +20,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 script {
-                    docker.build("${DOCKER_IMAGE}")
+                    docker.build(DOCKER_IMAGE)
                 }
             }
         }
@@ -28,8 +28,8 @@ pipeline {
         stage('Push to Docker Hub') {
             steps {
                 script {
-                    docker.withRegistry("https://${REGISTRY_URL}", REGISTRY_CREDENTIALS) {
-                        docker.image("${DOCKER_IMAGE}").push()
+                    docker.withRegistry(REGISTRY_URL, REGISTRY_CREDENTIALS) {
+                        docker.image(DOCKER_IMAGE).push()
                     }
                 }
             }
